@@ -31,6 +31,7 @@ class LeetCodeNotionApp {
       interval: null,
       isRunning: false,
     };
+    this.isEditingManualTime = false;
 
     this.problemData = null;
     this.notionPageId = null;
@@ -56,6 +57,19 @@ class LeetCodeNotionApp {
     document
       .getElementById("resetTimer")
       .addEventListener("click", () => this.resetTimer());
+    const manualTimeInput = document.getElementById("manualTimeInput");
+    manualTimeInput.addEventListener("focus", () => {
+      this.isEditingManualTime = true;
+    });
+    manualTimeInput.addEventListener("blur", () => {
+      this.isEditingManualTime = false;
+      this.applyManualTimeInput();
+    });
+    manualTimeInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      manualTimeInput.blur();
+    });
 
     // Save problem
     document
@@ -109,12 +123,11 @@ class LeetCodeNotionApp {
   }
 
   updateTimerDisplay() {
-    const totalSeconds = Math.floor(this.timer.elapsedTime / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const display = `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
+    const display = this.formatClock(this.timer.elapsedTime);
     document.getElementById("timerDisplay").textContent = display;
+    if (!this.isEditingManualTime) {
+      document.getElementById("manualTimeInput").value = display;
+    }
   }
 
   updateTimerButtons() {
@@ -138,6 +151,60 @@ class LeetCodeNotionApp {
 
   pad(num) {
     return num.toString().padStart(2, "0");
+  }
+
+  formatClock(elapsedMs) {
+    const totalSeconds = Math.floor(Math.max(elapsedMs, 0) / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
+  }
+
+  parseTimeToMs(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return null;
+    const parts = raw.split(":").map((part) => part.trim());
+    if (parts.length < 1 || parts.length > 3) return null;
+    if (parts.some((part) => !/^\d+$/.test(part))) return null;
+
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+
+    if (parts.length === 3) {
+      hours = Number(parts[0]);
+      minutes = Number(parts[1]);
+      seconds = Number(parts[2]);
+    } else if (parts.length === 2) {
+      minutes = Number(parts[0]);
+      seconds = Number(parts[1]);
+    } else {
+      seconds = Number(parts[0]);
+    }
+
+    if (parts.length === 3 && minutes > 59) return null;
+    if (seconds > 59 && parts.length > 1) return null;
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
+  }
+
+  applyManualTimeInput() {
+    const input = document.getElementById("manualTimeInput");
+    const manualMs = this.parseTimeToMs(input.value);
+    if (manualMs === null) {
+      input.value = this.formatClock(this.timer.elapsedTime);
+      this.showError("Invalid time format. Use HH:MM:SS or MM:SS.");
+      return;
+    }
+
+    this.timer.elapsedTime = manualMs;
+    if (this.timer.isRunning) {
+      this.timer.startTime = Date.now() - this.timer.elapsedTime;
+    }
+
+    this.updateTimerDisplay();
+    this.updateTimerButtons();
+    this.saveTimerState();
   }
 
   getFormattedTime() {
