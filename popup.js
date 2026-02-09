@@ -557,14 +557,20 @@ class LeetCodeNotionApp {
       return;
     }
 
-    // Check if already exists
+    // If page already exists, update editable fields instead of blocking save
     if (this.notionPageId) {
-      const shouldOpen = confirm(
-        "This problem already exists in your Notion database.\n\n" +
-          "Open the existing page now?",
-      );
-      if (shouldOpen) {
-        this.openInNotion();
+      this.showLoading(true);
+      try {
+        const data = this.prepareNotionData();
+        await this.updateExistingPage(this.notionPageId, data, settings);
+        this.showSuccess("Updated existing problem (Hint/Redo)");
+        this.showAlreadySavedBadge(true);
+        this.showNotionLinks();
+      } catch (error) {
+        console.error("Error updating existing Notion page:", error);
+        this.showError(error.message || "Failed to update existing problem");
+      } finally {
+        this.showLoading(false);
       }
       return;
     }
@@ -681,6 +687,70 @@ class LeetCodeNotionApp {
     }
 
     return await response.json();
+  }
+
+  async updateExistingPage(pageId, data, settings) {
+    const dbResponse = await fetch(
+      `https://api.notion.com/v1/databases/${settings.databaseId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${settings.notionToken}`,
+          "Notion-Version": "2022-06-28",
+        },
+      },
+    );
+
+    if (!dbResponse.ok) {
+      const error = await dbResponse.json();
+      throw new Error(error.message || "Failed to fetch database schema");
+    }
+
+    const db = await dbResponse.json();
+    const properties = this.buildCheckboxUpdateProperties(data, db.properties);
+
+    if (Object.keys(properties).length === 0) {
+      throw new Error('No "Needed Hint" / "Can Redo" checkbox properties found');
+    }
+
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${settings.notionToken}`,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+      },
+      body: JSON.stringify({ properties }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to update Notion page");
+    }
+
+    return await response.json();
+  }
+
+  buildCheckboxUpdateProperties(data, dbProperties = {}) {
+    const properties = {};
+    const checkboxFields = [
+      {
+        aliases: ["Needed Hint", "需要提示", "Hint", "Did I need a hint?"],
+        value: data.neededHint,
+      },
+      {
+        aliases: ["Can Redo", "可以重做", "Redo", "Could I redo it in a week"],
+        value: data.canRedo,
+      },
+    ];
+
+    for (const field of checkboxFields) {
+      const prop = this.findProperty(dbProperties, field.aliases, ["checkbox"]);
+      if (prop) {
+        properties[prop.name] = { checkbox: Boolean(field.value) };
+      }
+    }
+
+    return properties;
   }
 
   buildNotionProperties(data, dbProperties) {
