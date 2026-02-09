@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode to Notion - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+  <div class="options-container">
+    <header>
+      <h1>⚙️ LeetCode to Notion Settings</h1>
+      <p class="subtitle">Configure your Notion integration</p>
+    </header>
+
+    <main>
+      <section class="settings-section">
+        <h2>Notion Configuration</h2>
+
+        <div class="form-group">
+          <label for="notionToken">
+            Integration Token
+            <span class="required">*</span>
+          </label>
+          <input type="password" id="notionToken" placeholder="secret_..." class="input-field" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+          <small class="help-text">
+            Get your token from
+            <a href="https://www.notion.so/my-integrations" target="_blank">
+              notion.so/my-integrations
+            </a>
+          </small>
+          <small class="security-note">🔒 Stored locally on your device only</small>
+        </div>
+
+        <div class="form-group">
+          <label for="databaseId">
+            Database ID
+            <span class="required">*</span>
+          </label>
+          <input type="text" id="databaseId" placeholder="32-character database ID" class="input-field" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+          <small class="help-text">
+            Find this in your Notion database URL:<br>
+            <code>notion.so/workspace/<strong>DATABASE_ID</strong>?v=...</code>
+          </small>
+          <small class="security-note">🔒 Stored locally on your device only</small>
+        </div>
+
+        <div class="button-group">
+          <button id="testConnection" class="btn btn-secondary">
+            🔌 Test Connection
+          </button>
+          <button id="saveSettings" class="btn btn-primary">
+            💾 Save Settings
+          </button>
+          <button id="clearSettings" class="btn btn-danger">
+            🗑️ Clear All Data
+          </button>
+        </div>
+
+        <div id="statusMessage" class="status-message hidden" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="info-section">
+        <h2>📚 Quick Setup Guide</h2>
+
+        <div class="step">
+          <h3>Step 1: Create Notion Integration</h3>
+          <ol>
+            <li>Go to <a href="https://www.notion.so/my-integrations" target="_blank">notion.so/my-integrations</a></li>
+            <li>Click "+ New integration"</li>
+            <li>Name it "LeetCode Tracker"</li>
+            <li>Copy the Integration Token (starts with <code>secret_</code>)</li>
+          </ol>
+        </div>
+
+        <div class="step">
+          <h3>Step 2: Create Database</h3>
+          <ol>
+            <li>Create a new page in Notion</li>
+            <li>Add a Database (Full page)</li>
+            <li>Name it "LeetCode Problems"</li>
+            <li>Add these properties:
+              <ul>
+                <li><strong>Problem Name</strong> (Title)</li>
+                <li><strong>Number</strong> (Number)</li>
+                <li><strong>Difficulty</strong> (Select: Easy, Medium, Hard)</li>
+                <li><strong>Status</strong> (Select: Solved, Review, Mastered)</li>
+                <li><strong>URL</strong> (URL)</li>
+                <li><strong>Tags</strong> (Multi-select)</li>
+                <li><strong>Time Spent</strong> (Text)</li>
+                <li><strong>Date Added</strong> (Date)</li>
+                <li><strong>Language</strong> (Select: Python, JavaScript, Java, C++, SQL)</li>
+                <li><strong>Needed Hint</strong> (Checkbox)</li>
+                <li><strong>Can Redo</strong> (Checkbox)</li>
+                <li><strong>Notes</strong> (Text)</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <div class="step">
+          <h3>Step 3: Connect Database</h3>
+          <ol>
+            <li>In your Notion database, click "..." (top right)</li>
+            <li>Select "Add connections"</li>
+            <li>Choose your "LeetCode Tracker" integration</li>
+            <li>Copy the Database ID from the URL</li>
+            <li>Paste both Token and Database ID above</li>
+            <li>Click "Test Connection" to verify</li>
+            <li>Click "Save Settings" when done</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="security-section">
+        <h2>🔐 Privacy & Security</h2>
+        <div class="security-info">
+          <p>✅ All data stored locally using Chrome's secure storage API</p>
+          <p>✅ No external servers - direct browser ↔ Notion communication</p>
+          <p>✅ No tracking or analytics</p>
+          <p>✅ Data automatically cleared when extension is removed</p>
+          <p>✅ You have full control over your data</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>LeetCode to Notion Extension v1.0.5</p>
+      <p>
+        <a href="https://github.com/yourusername/leetcode-notion-extension" target="_blank">Documentation</a> •
+        <a href="https://github.com/yourusername/leetcode-notion-extension/issues" target="_blank">Report Issues</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+
+</html>

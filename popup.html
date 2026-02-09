@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>LeetCode</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Timer -->
+    <div class="timer">
+      <div id="timerDisplay" class="time">00:00:00</div>
+      <div class="btns">
+        <button id="startTimer" class="btn">Start</button>
+        <button id="pauseTimer" class="btn" disabled>Pause</button>
+        <button id="resetTimer" class="btn" disabled>Reset</button>
+      </div>
+    </div>
+
+    <!-- Problem -->
+    <div id="problemSection" class="problem">
+      <div class="title">
+        <span id="problemTitle" class="muted">Open a LeetCode problem</span>
+        <span id="problemDifficulty" class="diff muted">-</span>
+      </div>
+
+      <div id="tagsContainer" class="tags"></div>
+
+      <select id="status" class="input">
+        <option value="Solved">✅ Solved</option>
+        <option value="Review" selected>👀 Review</option>
+        <option value="Mastered">🏆 Mastered</option>
+      </select>
+
+      <select id="language" class="input">
+        <option value="python" selected>Python</option>
+        <option value="javascript">JavaScript</option>
+        <option value="java">Java</option>
+        <option value="cpp">C++</option>
+        <option value="sql">SQL</option>
+      </select>
+
+      <div class="checkboxes">
+        <label class="checkbox-label">
+          <input type="checkbox" id="neededHint" class="checkbox">
+          <span>Did I need a hint?</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="canRedo" class="checkbox">
+          <span>Could I redo it in a week?</span>
+        </label>
+      </div>
+
+      <textarea id="notes" placeholder="Notes..." rows="2" class="input"></textarea>
+
+      <div class="save-row">
+        <button id="saveProblem" class="btn-save">Save</button>
+        <span id="alreadySavedBadge" class="badge hidden">Already saved</span>
+      </div>
+
+      <div id="notionLinks" class="links hidden">
+        <button id="openInNotion" class="link">📖 Open</button>
+        <button id="openDatabase" class="link">🗂️ Database</button>
+      </div>
+    </div>
+
+    <div id="statusMessage" class="msg hidden"></div>
+    <div id="loadingOverlay" class="loading hidden">
+      <div class="spin"></div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+
+</html>
