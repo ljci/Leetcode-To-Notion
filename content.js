@@ -281,12 +281,12 @@ if (globalThis.__LEETCODE_NOTION_CONTENT_LOADED__) {
     }
 
     async extractCode(language) {
+      const codeFromDom = this.extractCodeFromDom();
+      if (codeFromDom) return codeFromDom;
+
       const slug = this.extractProblemSlug();
       const codeFromStorage = this.extractCodeFromStorage(language, slug);
       if (codeFromStorage) return codeFromStorage;
-
-      const codeFromDom = this.extractCodeFromDom();
-      if (codeFromDom) return codeFromDom;
 
       return null;
     }
@@ -295,11 +295,26 @@ if (globalThis.__LEETCODE_NOTION_CONTENT_LOADED__) {
       const editorRoot = document.querySelector(".monaco-editor .view-lines");
       if (!editorRoot) return null;
 
-      const lines = Array.from(editorRoot.querySelectorAll(".view-line")).map(
-        (line) => line.innerText.replace(/\u00a0/g, " "),
-      );
+      const lines = Array.from(editorRoot.querySelectorAll(".view-line"))
+        .map((line, index) => ({
+          index,
+          top: this.parsePx(line.style.top),
+          left: this.parsePx(line.style.left),
+          text: line.innerText.replace(/\u00a0/g, " "),
+        }))
+        .sort((a, b) => {
+          if (a.top !== b.top) return a.top - b.top;
+          if (a.left !== b.left) return a.left - b.left;
+          return a.index - b.index;
+        })
+        .map((line) => line.text);
       const code = lines.join("\n").trim();
       return code || null;
+    }
+
+    parsePx(value) {
+      const parsed = Number.parseFloat(value || "0");
+      return Number.isFinite(parsed) ? parsed : 0;
     }
 
     extractCodeFromStorage(language, slug) {
